@@ -257,6 +257,78 @@ def create_kitti_rangeview():
         points_dim=4,
     )
 
+def LiDAR_2_Pano_eth(
+    local_points_with_intensities, lidar_H, lidar_W, intrinsics, max_depth=80.0
+):
+    
+    pano, intensities = lidar_to_pano_with_intensities(
+        local_points_with_intensities=local_points_with_intensities,
+        lidar_H=lidar_H,
+        lidar_W=lidar_W,
+        lidar_K=intrinsics,
+        max_depth=max_depth,
+    )
+    range_view = np.zeros((lidar_H, lidar_W, 3))
+    range_view[:, :, 1] = intensities
+    range_view[:, :, 2] = pano
+    return range_view
+
+def generate_eth_train_data(
+    H,
+    W,
+    intrinsics,
+    lidar_paths,
+    out_dir,
+    points_dim,  
+):
+    """
+    Args:
+        H: Heights of the range view.
+        W: Width of the range view.
+        intrinsics: (fov_up, fov) of the range view.
+        out_dir: Output directory.
+    """
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    for lidar_path in tqdm(lidar_paths):
+        point_cloud = np.fromfile(lidar_path, dtype=np.float32)
+        point_cloud = point_cloud.reshape((-1, points_dim))
+        pano = LiDAR_2_Pano_eth(point_cloud, H, W, intrinsics)
+        frame_name = lidar_path.split("/")[-1]
+        suffix = frame_name.split(".")[-1]
+        frame_name = frame_name.replace(suffix, "npy")
+        np.save(out_dir / frame_name, pano)
+
+def create_eth_rangeview(args):
+    project_root = Path(__file__).parent.parent
+    eth_root = project_root / "data" / "eth"
+    out_dir = eth_root / "train"
+    
+    sequence_name = args.sequence_id
+
+    H = 66
+    W = 600 #TODO: set these correctly
+    intrinsics = (12.5, 120.0)  # fov_up, fov TODO: are these right?
+
+    s_frame_id = 1908
+    e_frame_id = 1971  # Inclusive TODO: set these correctly
+    frame_ids = list(range(s_frame_id, e_frame_id + 1))
+
+    lidar_dir = eth_root / sequence_name / "lidar"
+    lidar_paths = [
+        os.path.join(lidar_dir, "%010d.bin" % frame_id) for frame_id in frame_ids
+    ]
+
+    generate_train_data(
+        H=H,
+        W=W,
+        intrinsics=intrinsics,
+        lidar_paths=lidar_paths,
+        out_dir=out_dir,
+        points_dim=6,
+    )
 
 def main():
     parser = argparse.ArgumentParser()
@@ -264,7 +336,7 @@ def main():
         "--dataset",
         type=str,
         default="kitti360",
-        choices=["kitti360", "nerf_mvl"],
+        choices=["kitti360", "nerf_mvl", "eth"],
         help="The dataset loader to use.",
     )
     args = parser.parse_args()
@@ -274,6 +346,8 @@ def main():
         create_kitti_rangeview()
     elif args.dataset == "nerf_mvl":
         create_nerf_mvl_rangeview()
+    elif args.dataset == "eth":
+        create_eth_rangeview(args)
 
 
 if __name__ == "__main__":
