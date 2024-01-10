@@ -246,6 +246,9 @@ def main():
         "warning_sign",
         "water_safety_barrier",
     ]
+    eth_sequence_ids = [
+        "10"
+    ]
 
     # Specify dataloader class
     if opt.dataloader == "kitti360":
@@ -259,6 +262,13 @@ def main():
         from lidarnerf.dataset.nerfmvl_dataset import NeRFMVLDataset as NeRFDataset
 
         if opt.sequence_id not in nerf_mvl_sequence_ids:
+            raise ValueError(
+                f"Unknown sequence id {opt.sequence_id} for {opt.dataloader}"
+            )
+    elif opt.dataloader == "eth":
+        from lidarnerf.dataset.eth_dataset import ETHDataset as NeRFDataset
+
+        if opt.sequence_id not in eth_sequence_ids:
             raise ValueError(
                 f"Unknown sequence id {opt.sequence_id} for {opt.dataloader}"
             )
