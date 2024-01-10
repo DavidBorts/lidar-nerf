@@ -85,6 +85,46 @@ python -c "import lidarnerf; print(lidarnerf.__version__)"
 
 ## Dataset
 
+### ETH dataset
+
+Your folder structure should look like this before preprocessing:
+
+```bash
+data
+└── eth
+    └── SEQ_NAME
+        ├── gnss
+        └── lidar
+    └── calib3.json
+```
+
+Next, run ETH dataset preprocessing:
+
+```bash
+# Generate train range images
+python preprocess/generate_train_rangeview.py --dataset eth --seq_id SEQ_NAME --start_frame x --end_frame y
+
+# Generate jsons
+python preprocess/eth_to_nerf.py
+
+# Calculate center pose (optional) can directly use our config
+python preprocess/cal_centerpose_bound_eth.py
+```
+
+After preprocessing, your folder structure should look like this:
+
+```bash
+data
+└── eth
+    ├── train
+    ├── SEQ_NAME
+    │   ├── gnss
+    │   └── lidar
+    ├── transforms_{SEQ_NAME}test.json
+    ├── transforms_{SEQ_NAME}train.json
+    └── transforms_{SEQ_NAME}val.json
+```
+
 ### KITTI-360 dataset
 
 First, download KITTI-360 dataset from
