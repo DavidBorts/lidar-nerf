@@ -304,29 +304,40 @@ def generate_eth_train_data(
 def create_eth_rangeview(args):
     project_root = Path(__file__).parent.parent
     eth_root = project_root / "data" / "eth"
+    print(f"project root: {project_root}")
+    print(f"eth dataset root: {eth_root}")
     
     sequence_name = args.sequence_id
     out_dir = eth_root / sequence_name / "train"
+    print(f"sequence name: {sequence_name}")
+    print(f"writing range view images to: {out_dir}")
 
-    H = 360
-    W = 3000 #TODO: set these correctly
-    intrinsics = (12.5, 120.0)  # fov_up, fov TODO: are these right?
+    H = 125
+    W = 600 #TODO: set these correctly
+    intrinsics = (12.5, 25.0)  # fov_up, fov TODO: are these right?
 
     s_frame_id = args.start_frame
     e_frame_id = args.end_frame  # Inclusive TODO: set these correctly
     frame_ids = list(range(s_frame_id, e_frame_id + 1))
+    print(f"start frame #: {s_frame_id}, end frame #: {e_frame_id}")
+    print(f"selected frame #s: {frame_ids}")
 
     lidar_dir = eth_root / sequence_name / "lidar"
     lidar_frames = os.listdir(lidar_dir)
     lidar_frames = sorted([f for f in lidar_frames if f.endswith('.bin')])
+    print(f"reading LiDAR data from: {lidar_dir}")
+    print(f"sorted lidar frames found: {lidar_frames}")
 
     # convert ids to lidar timestamps
     # NOTE: frame idx are 1-indexed
     lidar_paths = [lidar_frames[frame_id-1] for frame_id in frame_ids]
+    print(f"frame #s converted to corresponding LiDAR filenames: {lidar_paths}")
 
     lidar_paths = [
         os.path.join(lidar_dir, lidar_filename) for lidar_filename in lidar_paths
     ]
+    print(lidar_paths)
+    quit()
 
     generate_eth_train_data(
         H=H,
@@ -365,6 +376,7 @@ def main():
     args = parser.parse_args()
 
     # Check dataset.
+    print(f"dataset: {args.dataset}")
     if args.dataset == "kitti360":
         create_kitti_rangeview()
     elif args.dataset == "nerf_mvl":
