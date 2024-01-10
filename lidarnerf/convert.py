@@ -257,6 +257,7 @@ def lidar_to_pano_with_intensities_fpa(
     lidar_K: int,
     max_depth=80,
     z_buffer_len=10,
+    fov_dwn=None
 ):
     """
     Convert lidar frame to pano frame with intensities with bbox_mask.
@@ -279,6 +280,8 @@ def lidar_to_pano_with_intensities_fpa(
     local_point_intensities = local_points_with_intensities[:, 3]
     fov_up, fov = lidar_K
     fov_down = fov - fov_up
+    if fov_dwn is not None:
+        fov_down = fov_dwn
 
     # Compute dists to lidar center.
     dists = np.linalg.norm(local_points, axis=1)
