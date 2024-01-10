@@ -260,7 +260,7 @@ def create_kitti_rangeview():
 def LiDAR_2_Pano_eth(
     local_points_with_intensities, lidar_H, lidar_W, intrinsics, max_depth=80.0
 ):
-    
+    #TODO: is max_depth set correctly?
     pano, intensities = lidar_to_pano_with_intensities(
         local_points_with_intensities=local_points_with_intensities,
         lidar_H=lidar_H,
@@ -304,24 +304,31 @@ def generate_eth_train_data(
 def create_eth_rangeview(args):
     project_root = Path(__file__).parent.parent
     eth_root = project_root / "data" / "eth"
-    out_dir = eth_root / "train"
     
     sequence_name = args.sequence_id
+    out_dir = eth_root / sequence_name / "train"
 
-    H = 66
-    W = 600 #TODO: set these correctly
+    H = 360
+    W = 3000 #TODO: set these correctly
     intrinsics = (12.5, 120.0)  # fov_up, fov TODO: are these right?
 
-    s_frame_id = 1908
-    e_frame_id = 1971  # Inclusive TODO: set these correctly
+    s_frame_id = args.start_frame
+    e_frame_id = args.end_frame  # Inclusive TODO: set these correctly
     frame_ids = list(range(s_frame_id, e_frame_id + 1))
 
     lidar_dir = eth_root / sequence_name / "lidar"
+    lidar_frames = os.listdir(lidar_dir)
+    lidar_frames = sorted([f for f in lidar_frames if f.endswith('.bin')])
+
+    # convert ids to lidar timestamps
+    # NOTE: frame idx are 1-indexed
+    lidar_paths = [lidar_frames[frame_id-1] for frame_id in frame_ids]
+
     lidar_paths = [
-        os.path.join(lidar_dir, "%010d.bin" % frame_id) for frame_id in frame_ids
+        os.path.join(lidar_dir, lidar_filename) for lidar_filename in lidar_paths
     ]
 
-    generate_train_data(
+    generate_eth_train_data(
         H=H,
         W=W,
         intrinsics=intrinsics,
@@ -338,6 +345,22 @@ def main():
         default="kitti360",
         choices=["kitti360", "nerf_mvl", "eth"],
         help="The dataset loader to use.",
+    )
+    parser.add_argument(
+        "--seq_id",
+        type=str,
+        choices=["seq10"],
+        help="sequence ID"
+    )
+    parser.add_argument(
+        "--start_frame",
+        type=int,
+        help="(inclusive) start frame idx"
+    )
+    parser.add_argument(
+        "--end_frame",
+        type=int,
+        help="(inclusive) end frame idx"
     )
     args = parser.parse_args()
 
