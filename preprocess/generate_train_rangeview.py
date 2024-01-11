@@ -7,7 +7,6 @@ import argparse
 
 # debug imports
 import matplotlib.pyplot as plt
-import open3d as o3d
 
 from lidarnerf.convert import (
     lidar_to_pano_with_intensities,
@@ -261,54 +260,54 @@ def create_kitti_rangeview():
         points_dim=4,
     )
 
-def view_pc(pc, render_path):
-    """
-    Render a bird's eye view of a point cloud
+# def view_pc(pc, render_path):
+#     """
+#     Render a bird's eye view of a point cloud
 
-    Arguments:
-        :param pc: numpy array of shape (N, 3) representing the point cloud
-    """
-    # Create an Open3D PointCloud object
-    point_cloud = o3d.geometry.PointCloud()
-    point_cloud.points = o3d.utility.Vector3dVector(pc)
-    # point_cloud.colors = o3d.utility.Vector3dVector(np.tile(np.array([[1, 1, 1]]), (len(pc), 1)))  # Set color to bright red
+#     Arguments:
+#         :param pc: numpy array of shape (N, 3) representing the point cloud
+#     """
+#     # Create an Open3D PointCloud object
+#     point_cloud = o3d.geometry.PointCloud()
+#     point_cloud.points = o3d.utility.Vector3dVector(pc)
+#     # point_cloud.colors = o3d.utility.Vector3dVector(np.tile(np.array([[1, 1, 1]]), (len(pc), 1)))  # Set color to bright red
 
-    # Paint the point cloud with uniform bright red color
-    point_cloud.paint_uniform_color([0, 0, 0.6])
+#     # Paint the point cloud with uniform bright red color
+#     point_cloud.paint_uniform_color([0, 0, 0.6])
 
-    # Get the bounding box of the point cloud to set up the camera
-    min_bound = np.min(pc, axis=0)
-    max_bound = np.max(pc, axis=0)
-    center = (min_bound + max_bound) / 2.0
+#     # Get the bounding box of the point cloud to set up the camera
+#     min_bound = np.min(pc, axis=0)
+#     max_bound = np.max(pc, axis=0)
+#     center = (min_bound + max_bound) / 2.0
 
-    # Set up the camera parameters for a top-down view
-    camera_params = {
-        "eye": [center[0], center[1], max_bound[2] + 5],  # Camera positioned above the point cloud
-        "at": [center[0], center[1], center[2]],          # Camera looks at the center of the point cloud
-        "up": [0, 0, 1],#[0, 1, 0],                       # Up vector (positive y-axis)
-        "zoom": 4.8,
-    }
+#     # Set up the camera parameters for a top-down view
+#     camera_params = {
+#         "eye": [center[0], center[1], max_bound[2] + 5],  # Camera positioned above the point cloud
+#         "at": [center[0], center[1], center[2]],          # Camera looks at the center of the point cloud
+#         "up": [0, 0, 1],#[0, 1, 0],                       # Up vector (positive y-axis)
+#         "zoom": 4.8,
+#     }
 
-    # Create a Visualizer with the specified camera parameters
-    vis = o3d.visualization.Visualizer()
-    vis.create_window(width=800, height=600, visible=False)
-    vis.get_render_option().background_color = [1, 1, 1]  # Set background color to white
-    vis.get_render_option().point_size = 1.0
+#     # Create a Visualizer with the specified camera parameters
+#     vis = o3d.visualization.Visualizer()
+#     vis.create_window(width=800, height=600, visible=False)
+#     vis.get_render_option().background_color = [1, 1, 1]  # Set background color to white
+#     vis.get_render_option().point_size = 1.0
   
-    vis.add_geometry(point_cloud)
-    vis.get_view_control().set_lookat(camera_params["at"])
-    vis.get_view_control().set_up(camera_params["up"])
-    vis.get_view_control().set_front([0, -1, 0])
-    vis.get_view_control().set_zoom(camera_params["zoom"])
-    #vis.get_view_control().convert_from_pinhole_camera_parameters(camera_params)
+#     vis.add_geometry(point_cloud)
+#     vis.get_view_control().set_lookat(camera_params["at"])
+#     vis.get_view_control().set_up(camera_params["up"])
+#     vis.get_view_control().set_front([0, -1, 0])
+#     vis.get_view_control().set_zoom(camera_params["zoom"])
+#     #vis.get_view_control().convert_from_pinhole_camera_parameters(camera_params)
 
-    vis.run()
-    #vis.poll_events()
-    #vis.update_renderer()
+#     vis.run()
+#     #vis.poll_events()
+#     #vis.update_renderer()
 
-    # Take a screenshot and save it as a .png file
-    vis.capture_screen_image(str(render_path))
-    vis.destroy_window()
+#     # Take a screenshot and save it as a .png file
+#     vis.capture_screen_image(str(render_path))
+#     vis.destroy_window()
 
 def vis_pc_range_img(pano, point_cloud, render_path):
 
