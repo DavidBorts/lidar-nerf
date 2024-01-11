@@ -247,7 +247,7 @@ def main():
         "water_safety_barrier",
     ]
     eth_sequence_ids = [
-        "10"
+        "seq10"
     ]
 
     # Specify dataloader class
