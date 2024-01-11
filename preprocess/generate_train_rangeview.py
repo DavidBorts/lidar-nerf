@@ -294,7 +294,7 @@ def generate_eth_train_data(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     for lidar_path in tqdm(lidar_paths):
-        point_cloud = np.fromfile(lidar_path, dtype=np.float32)
+        point_cloud = np.fromfile(lidar_path, dtype=np.float64)
         print(f"point cloud shape: {point_cloud.shape}")
         point_cloud = point_cloud.reshape((-1, points_dim))
         print(f"pc mean: {np.mean(point_cloud[:,:3])}, min: {np.min(point_cloud[:,:3])}, max: {np.max(point_cloud[:,:3])}")
