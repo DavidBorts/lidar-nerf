@@ -14,7 +14,7 @@ def main():
     # argparser
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--sequence_name",
+        "--seq_id",
         type=str,
         default="10",
         help="sequence name to use",
@@ -37,7 +37,7 @@ def main():
     args = parser.parse_args()
 
     # Specify frames and splits.
-    sequence_name = args.sequence_name
+    sequence_name = args.seq_id
     s_frame_id = args.start_frame
     e_frame_id = args.end_frame  # Inclusive
 
