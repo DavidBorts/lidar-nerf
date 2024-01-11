@@ -307,7 +307,7 @@ def create_eth_rangeview(args):
     print(f"project root: {project_root}")
     print(f"eth dataset root: {eth_root}")
     
-    sequence_name = args.sequence_id
+    sequence_name = args.seq_id
     out_dir = eth_root / sequence_name / "train"
     print(f"sequence name: {sequence_name}")
     print(f"writing range view images to: {out_dir}")
