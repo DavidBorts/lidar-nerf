@@ -295,7 +295,9 @@ def generate_eth_train_data(
 
     for lidar_path in tqdm(lidar_paths):
         point_cloud = np.fromfile(lidar_path, dtype=np.float32)
+        print(f"point cloud shape: {point_cloud.shape}")
         point_cloud = point_cloud.reshape((-1, points_dim))
+        print(f"pc mean: {np.mean(point_cloud[:,:3])}, min: {np.min(point_cloud[:,:3])}, max: {np.max(point_cloud[:,:3])}")
         pano = LiDAR_2_Pano_eth(point_cloud, H, W, intrinsics)
         frame_name = lidar_path.split("/")[-1]
         suffix = frame_name.split(".")[-1]
