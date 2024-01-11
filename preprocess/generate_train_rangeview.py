@@ -261,7 +261,7 @@ def create_kitti_rangeview():
         points_dim=4,
     )
 
-def view_pc(pc):
+def view_pc(pc, render_path):
     """
     Render a bird's eye view of a point cloud
 
@@ -291,7 +291,7 @@ def view_pc(pc):
 
     # Create a Visualizer with the specified camera parameters
     vis = o3d.visualization.Visualizer()
-    vis.create_window(width=800, height=600, visible=True)
+    vis.create_window(width=800, height=600, visible=False)
     vis.get_render_option().background_color = [1, 1, 1]  # Set background color to white
     vis.get_render_option().point_size = 1.0
   
@@ -306,11 +306,13 @@ def view_pc(pc):
     #vis.poll_events()
     #vis.update_renderer()
 
+    # Take a screenshot and save it as a .png file
+    vis.capture_screen_image(str(render_path))
     vis.destroy_window()
 
-def vis_pc_range_img(pano, point_cloud):
+def vis_pc_range_img(pano, point_cloud, render_path):
 
-    view_pc(point_cloud)
+    view_pc(point_cloud, render_path=render_path)
 
     plt.imshow(pano)
     plt.show()
@@ -361,7 +363,9 @@ def generate_eth_train_data(
         suffix = frame_name.split(".")[-1]
         frame_name = frame_name.replace(suffix, "npy")
         if debug:
-            vis_pc_range_img(pano, point_cloud[:,3])
+            render_path = frame_name
+            render_path = render_path.replace("npy", "png")
+            vis_pc_range_img(pano, point_cloud[:,3], render_path)
         np.save(out_dir / frame_name, pano)
 
 def create_eth_rangeview(args):
