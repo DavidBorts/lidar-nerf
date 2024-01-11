@@ -76,13 +76,14 @@ def main():
     print(f"selected frame ids {frame_ids}")
     print(f"selected test frame ids: {test_frame_ids}")
     print(f"selected train frame ids: {train_frame_ids}")
-    quit()
 
     # Get lidar paths (range view not raw data).
     range_view_dir = data_path / "train"
 
     # Get lidar2worlds
     lidar2worlds = eth.load_lidars(sequence_name, train_frame_ids, test_frame_ids)
+    print(f"lidar2worlds: {lidar2worlds}")
+    quit()
 
     # Get image dimensions, assume all images have the same dimensions.
     lidar_range_image = np.load(range_view_dir / "{:010d}.npy".format(int(frame_ids[0].split('.')[0])))
