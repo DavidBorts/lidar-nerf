@@ -5,6 +5,10 @@ from tqdm import tqdm
 import shutil
 import argparse
 
+# debug imports
+import matplotlib.pyplot as plt
+import open3d as o3d
+
 from lidarnerf.convert import (
     lidar_to_pano_with_intensities,
     lidar_to_pano_with_intensities_with_bbox_mask,
@@ -257,6 +261,60 @@ def create_kitti_rangeview():
         points_dim=4,
     )
 
+def view_pc(pc):
+    """
+    Render a bird's eye view of a point cloud
+
+    Arguments:
+        :param pc: numpy array of shape (N, 3) representing the point cloud
+    """
+    # Create an Open3D PointCloud object
+    point_cloud = o3d.geometry.PointCloud()
+    point_cloud.points = o3d.utility.Vector3dVector(pc)
+    # point_cloud.colors = o3d.utility.Vector3dVector(np.tile(np.array([[1, 1, 1]]), (len(pc), 1)))  # Set color to bright red
+
+    # Paint the point cloud with uniform bright red color
+    point_cloud.paint_uniform_color([0, 0, 0.6])
+
+    # Get the bounding box of the point cloud to set up the camera
+    min_bound = np.min(pc, axis=0)
+    max_bound = np.max(pc, axis=0)
+    center = (min_bound + max_bound) / 2.0
+
+    # Set up the camera parameters for a top-down view
+    camera_params = {
+        "eye": [center[0], center[1], max_bound[2] + 5],  # Camera positioned above the point cloud
+        "at": [center[0], center[1], center[2]],          # Camera looks at the center of the point cloud
+        "up": [0, 0, 1],#[0, 1, 0],                       # Up vector (positive y-axis)
+        "zoom": 4.8,
+    }
+
+    # Create a Visualizer with the specified camera parameters
+    vis = o3d.visualization.Visualizer()
+    vis.create_window(width=800, height=600, visible=True)
+    vis.get_render_option().background_color = [1, 1, 1]  # Set background color to white
+    vis.get_render_option().point_size = 1.0
+  
+    vis.add_geometry(point_cloud)
+    vis.get_view_control().set_lookat(camera_params["at"])
+    vis.get_view_control().set_up(camera_params["up"])
+    vis.get_view_control().set_front([0, -1, 0])
+    vis.get_view_control().set_zoom(camera_params["zoom"])
+    #vis.get_view_control().convert_from_pinhole_camera_parameters(camera_params)
+
+    vis.run()
+    #vis.poll_events()
+    #vis.update_renderer()
+
+    vis.destroy_window()
+
+def vis_pc_range_img(pano, point_cloud):
+
+    view_pc(point_cloud)
+
+    plt.imshow(pano)
+    plt.show()
+
 def LiDAR_2_Pano_eth(
     local_points_with_intensities, lidar_H, lidar_W, intrinsics, max_depth=180.0
 ):
@@ -279,7 +337,8 @@ def generate_eth_train_data(
     intrinsics,
     lidar_paths,
     out_dir,
-    points_dim,  
+    points_dim,
+    debug=False  
 ):
     """
     Args:
@@ -301,6 +360,8 @@ def generate_eth_train_data(
         frame_name = lidar_path.split("/")[-1]
         suffix = frame_name.split(".")[-1]
         frame_name = frame_name.replace(suffix, "npy")
+        if debug:
+            vis_pc_range_img(pano, point_cloud[:,3])
         np.save(out_dir / frame_name, pano)
 
 def create_eth_rangeview(args):
@@ -338,6 +399,7 @@ def create_eth_rangeview(args):
         lidar_paths=lidar_paths,
         out_dir=out_dir,
         points_dim=6,
+        debug=args.debug
     )
 
 def main():
@@ -364,6 +426,10 @@ def main():
         "--end_frame",
         type=int,
         help="(inclusive) end frame idx"
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true"
     )
     args = parser.parse_args()
 
