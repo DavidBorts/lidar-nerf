@@ -71,6 +71,9 @@ def get_translation_gnss2ned(ublox_data, reference_point_ublox_data=None):
     gps_point_meters = latlon_to_ned(ublox_height, ublox_lat, ublox_lon)
 
     # Deduct reference point
+    print(ublox_data)
+    print(f"orig point: {gps_point_meters}")
+    print(f"ref point: {reference_point}")
     gps_point_meters_relative = gps_point_meters - reference_point
 
     return gps_point_meters_relative.squeeze()
