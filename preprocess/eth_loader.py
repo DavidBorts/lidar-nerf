@@ -140,14 +140,14 @@ class ETHLoader:
             xyzrpy = gnss.find_updated_position(timestamp)
 
             # compute gnss2world (offset by origin)
-            data = {
-                "longitude": xyzrpy[0],
-                "latitude": xyzrpy[1],
-                "height": xyzrpy[2],
-                "roll": xyzrpy[3],
-                "pitch": xyzrpy[4],
-                "yaw": xyzrpy[5]
-            }
+            # data = {
+            #     "longitude": xyzrpy[0],
+            #     "latitude": xyzrpy[1],
+            #     "height": xyzrpy[2],
+            #     "roll": xyzrpy[3],
+            #     "pitch": xyzrpy[4],
+            #     "yaw": xyzrpy[5]
+            # }
 
             # computing gnss2world
             gnss2world = ublox_to_gnss2ned(data, reference_point_ublox_data=zero_position)
