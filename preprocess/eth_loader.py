@@ -115,6 +115,7 @@ class ETHLoader:
         smoothed_state_means, smoothed_state_covariances = gnss.apply_advanced_kalman(xyzrpys)
         
         # compute gnss2world and lidar2world matrices
+        all_pts = []
         for gnss_frame, lidar_frame in tqdm.tqdm(zip(matched_gnss_frames, self.lidar_frames), desc=f"Computing extrinsic matrices"):
 
             # read in txt data for each gnss frame
@@ -154,6 +155,27 @@ class ETHLoader:
             # use gnss2world to compute lidar2world for this frame
             lidar2world = np.matmul(gnss2world, lidar2gnss)
             lidar2world_dict[lidar_frame] = lidar2world
+
+            # read in corresponding lidar pc
+            point_cloud = np.fromfile(self.lidar_dir / lidar_frame, dtype=np.float64)
+            point_cloud = point_cloud.reshape((-1, 6))[:,:3]
+
+            # convert pc to world coords using lidar2world
+            N, _ = point_cloud.shape
+            point_cloud = np.concatenate((point_cloud, np.ones((N, 1))), axis=-1) # [N, 4] reformatting into homogenous coords
+            point_cloud = np.einsum("kl,nl->nk", lidar2world, point_cloud)# [4, 4] * [N, 4] -> [N, 4]
+            assert(point_cloud.shape[1] == 4)
+            point_cloud = point_cloud[...,0:3] # [N, 3]
+            all_pts.append(point_cloud)
+        
+        # finding offset and scale
+        all_pts = np.concatenate(all_pts, axis=0)
+        assert(all_pts.shape[1] == 3)
+        offsets = np.min(all_pts, axis=0)
+        assert(len(offsets) == 3)
+        scale = 1.0 / np.max(all_pts - offsets)
+        print(f"offsets: {offsets}")
+        print(f"scale: {scale}")
         
         return lidar2world_dict
 
