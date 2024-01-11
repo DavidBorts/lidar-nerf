@@ -120,13 +120,12 @@ def lidar_to_pano_with_intensities(
     """
     # Un pack.
     local_points = local_points_with_intensities[:, :3]
-    print(f"local points shape: {local_points.shape}")
     local_point_intensities = local_points_with_intensities[:, 3]
     fov_up, fov = lidar_K
     fov_down = fov - fov_up
-    print(f"fov_down: {fov_down}, fov: {fov}")
 
     # Compute dists to lidar center.
+    print(local_points)
     dists = np.linalg.norm(local_points, axis=1)
     print(f"dists shape: {dists.shape}")
 

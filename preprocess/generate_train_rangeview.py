@@ -296,12 +296,10 @@ def generate_eth_train_data(
     for lidar_path in tqdm(lidar_paths):
         point_cloud = np.fromfile(lidar_path, dtype=np.float32)
         point_cloud = point_cloud.reshape((-1, points_dim))
-        print(f"pc shape: {point_cloud.shape}")
         pano = LiDAR_2_Pano_eth(point_cloud, H, W, intrinsics)
         frame_name = lidar_path.split("/")[-1]
         suffix = frame_name.split(".")[-1]
         frame_name = frame_name.replace(suffix, "npy")
-        print(f"saving range image to: {out_dir / frame_name}")
         quit()
         np.save(out_dir / frame_name, pano)
 
