@@ -105,7 +105,7 @@ Next, run ETH dataset preprocessing:
 python preprocess/generate_train_rangeview.py --dataset eth --seq_id SEQ_NAME --start_frame x --end_frame y
 
 # Generate jsons
-python preprocess/eth_to_nerf.py
+python preprocess/eth_to_nerf.py --dataset eth --seq_id SEQ_NAME --start_frame x --end_fram y --val_frames xyz
 
 # Calculate center pose (optional) can directly use our config
 python preprocess/cal_centerpose_bound_eth.py
