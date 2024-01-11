@@ -19,10 +19,10 @@ def get_arg_parser():
     parser.add_argument(
         "--config",
         is_config_file=True,
-        default="configs/kitti360_1908.txt",
+        default="configs/eth.txt",
         help="config file path",
     )
-    parser.add_argument("--path", type=str, default="data/kitti360")
+    parser.add_argument("--path", type=str, default="data/eth")
     parser.add_argument(
         "-L", action="store_true", help="equals --fp16 --tcnn --preload"
     )
@@ -37,9 +37,9 @@ def get_arg_parser():
     )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument(
-        "--dataloader", type=str, choices=("kitti360", "nerf_mvl"), default="kitti360"
+        "--dataloader", type=str, choices=("kitti360", "nerf_mvl", "eth"), default="eth"
     )
-    parser.add_argument("--sequence_id", type=str, default="1908")
+    parser.add_argument("--sequence_id", type=str, default="seq10")
 
     ### lidar-nerf
     parser.add_argument("--enable_lidar", action="store_true", help="Enable lidar.")
