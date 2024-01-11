@@ -268,7 +268,6 @@ def LiDAR_2_Pano_eth(
         lidar_K=intrinsics,
         max_depth=max_depth,
     )
-    print(f"pano, intensities shape: {pano.shape} - {intensities.shape}")
     range_view = np.zeros((lidar_H, lidar_W, 3))
     range_view[:, :, 1] = intensities
     range_view[:, :, 2] = pano
@@ -295,14 +294,13 @@ def generate_eth_train_data(
 
     for lidar_path in tqdm(lidar_paths):
         point_cloud = np.fromfile(lidar_path, dtype=np.float64)
-        print(f"point cloud shape: {point_cloud.shape}")
+        #print(f"point cloud shape: {point_cloud.shape}")
         point_cloud = point_cloud.reshape((-1, points_dim))
-        print(f"pc mean: {np.mean(point_cloud[:,:3])}, min: {np.min(point_cloud[:,:3])}, max: {np.max(point_cloud[:,:3])}")
+        #print(f"pc mean: {np.mean(point_cloud[:,:3])}, min: {np.min(point_cloud[:,:3])}, max: {np.max(point_cloud[:,:3])}")
         pano = LiDAR_2_Pano_eth(point_cloud, H, W, intrinsics)
         frame_name = lidar_path.split("/")[-1]
         suffix = frame_name.split(".")[-1]
         frame_name = frame_name.replace(suffix, "npy")
-        quit()
         np.save(out_dir / frame_name, pano)
 
 def create_eth_rangeview(args):

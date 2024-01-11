@@ -125,9 +125,7 @@ def lidar_to_pano_with_intensities(
     fov_down = fov - fov_up
 
     # Compute dists to lidar center.
-    print(local_points)
     dists = np.linalg.norm(local_points, axis=1)
-    print(f"dists shape: {dists.shape}")
 
     # Fill pano and intensities.
     pano = np.zeros((lidar_H, lidar_W)) # TODO: what do H and W really stand for here? check velodyne 64 specs
