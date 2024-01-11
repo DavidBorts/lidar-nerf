@@ -63,17 +63,6 @@ def main():
     lidar_frames = sorted([f for f in lidar_frames if f.endswith('.bin')])
     gnss_dir = data_path / "gnss"
 
-    # debug prints
-    print(f"seq id: {sequence_name}")
-    print(f"start frame #, end frame #: {s_frame_id}, {e_frame_id}")
-    print(f"selected frame #s {frame_ids}")
-    print(f"selected test frame #s: {test_frame_ids}")
-    print(f"data path: {data_path}")
-    print(f"lidar dir: {lidar_dir}")
-    print(f"all lidar frames: {lidar_frames}")
-    print(f"gnss dir: {gnss_dir}")
-    quit()
-
     # convert ids to lidar timestamps
     # NOTE: frame idx are 1-indexed
     frame_ids = [lidar_frames[frame_id-1] for frame_id in frame_ids]
@@ -82,6 +71,12 @@ def main():
 
     # Load KITTI-360 dataset.
     eth = ETHLoader(eth_root, data_path, lidar_dir, gnss_dir)
+
+    # debug prints
+    print(f"selected frame ids {frame_ids}")
+    print(f"selected test frame ids: {test_frame_ids}")
+    print(f"selected train frame ids: {train_frame_ids}")
+    quit()
 
     # Get lidar paths (range view not raw data).
     range_view_dir = data_path / "train"
