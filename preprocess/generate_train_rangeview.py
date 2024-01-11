@@ -363,7 +363,7 @@ def generate_eth_train_data(
         frame_name = frame_name.replace(suffix, "npy")
         if debug:
             render_path = frame_name.split(".")[0]
-            vis_pc_range_img(pano, point_cloud[:,:3], render_path)
+            vis_pc_range_img(pano, point_cloud[:,:3], out_dir / render_path)
         np.save(out_dir / frame_name, pano)
 
 def create_eth_rangeview(args):
