@@ -312,10 +312,19 @@ def view_pc(pc, render_path):
 
 def vis_pc_range_img(pano, point_cloud, render_path):
 
-    view_pc(point_cloud, render_path=render_path)
+    view_pc(point_cloud, render_path=render_path + ".png")
 
-    plt.imshow(pano)
-    plt.show()
+    fig, ax = plt.subplots(1, 2)
+
+    ax[0].imshow(pano)
+    
+    fig.canvas.draw()
+
+    image_from_plot = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+    image_from_plot = image_from_plot.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+
+    plt.imsave(render_path + "_rangeview.png", image_from_plot)
+    plt.close()
 
 def LiDAR_2_Pano_eth(
     local_points_with_intensities, lidar_H, lidar_W, intrinsics, max_depth=180.0
@@ -363,8 +372,7 @@ def generate_eth_train_data(
         suffix = frame_name.split(".")[-1]
         frame_name = frame_name.replace(suffix, "npy")
         if debug:
-            render_path = frame_name
-            render_path = render_path.replace("npy", "png")
+            render_path = frame_name.split(".")[0]
             vis_pc_range_img(pano, point_cloud[:,3], render_path)
         np.save(out_dir / frame_name, pano)
 
