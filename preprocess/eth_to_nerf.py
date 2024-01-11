@@ -72,18 +72,11 @@ def main():
     # Load KITTI-360 dataset.
     eth = ETHLoader(eth_root, data_path, lidar_dir, gnss_dir)
 
-    # debug prints
-    print(f"selected frame ids {frame_ids}")
-    print(f"selected test frame ids: {test_frame_ids}")
-    print(f"selected train frame ids: {train_frame_ids}")
-
     # Get lidar paths (range view not raw data).
     range_view_dir = data_path / "train"
 
     # Get lidar2worlds
     lidar2worlds = eth.load_lidars(sequence_name, train_frame_ids, test_frame_ids)
-    print(f"lidar2worlds: {lidar2worlds}")
-    quit()
 
     # Get image dimensions, assume all images have the same dimensions.
     lidar_range_image = np.load(range_view_dir / "{:010d}.npy".format(int(frame_ids[0].split('.')[0])))
@@ -123,6 +116,7 @@ def main():
             ],
         }
         json_path = eth_root / f"transforms_{sequence_name}_{split}.json"
+        print(json_dict)
 
         with open(json_path, "w") as f:
             json.dump(json_dict, f, indent=2)

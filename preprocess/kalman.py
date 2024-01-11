@@ -96,7 +96,6 @@ class GNSSHandler(object):
                               gnss_values[1, 4] - gnss_values[0, 4],
                               gnss_values[1, 5] - gnss_values[0, 5]]
         idx = np.argsort(timestamps)
-        print(idx)
         timestamps = SortedList(np.array(timestamps)[idx])
         gnss_values = np.array(gnss_values)[idx.tolist()]
         self.timestamps = timestamps
@@ -117,7 +116,6 @@ class GNSSHandler(object):
 
     def apply_advanced_kalman(self, xyzrpys):
         self.kf = self.kf.em(xyzrpys.copy(), n_iter=15)
-        print(xyzrpys.shape)
         (smoothed_state_means, smoothed_state_covariances) = self.kf.smooth(xyzrpys)
 
         return smoothed_state_means, smoothed_state_covariances
@@ -155,7 +153,6 @@ class GNSSHandler(object):
                            initial_state_mean=initial_state_mean)
         kf1 = kf1.em(xyzrpys.copy(), n_iter=5)
         (smoothed_state_means, smoothed_state_covariances) = kf1.smooth(xyzrpys)
-        print(kf1.observation_covariance)
         kf2 = KalmanFilter(transition_matrices=transition_matrix,
                            observation_matrices=observation_matrix,
                            initial_state_mean=initial_state_mean,

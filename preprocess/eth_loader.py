@@ -168,10 +168,8 @@ class ETHLoader:
         """
         lidar2world_dict = self._load_all_lidars(sequence_name)
         lidar2worlds_train = [lidar2world_dict[frame_id] for frame_id in train_frame_ids]
-        print(f"lidar2worlds train: {lidar2worlds_train}")
         lidar2worlds_train = np.stack(lidar2worlds_train)
         lidar2worlds_test = [lidar2world_dict[frame_id] for frame_id in test_frame_ids]
-        print(f"lidar2worlds test: {lidar2worlds_test}")
         lidar2worlds_test = np.stack(lidar2worlds_test)
 
         lidar2worlds = {
