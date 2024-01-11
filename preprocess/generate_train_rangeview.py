@@ -258,7 +258,7 @@ def create_kitti_rangeview():
     )
 
 def LiDAR_2_Pano_eth(
-    local_points_with_intensities, lidar_H, lidar_W, intrinsics, max_depth=80.0
+    local_points_with_intensities, lidar_H, lidar_W, intrinsics, max_depth=180.0
 ):
     #TODO: is max_depth set correctly?
     pano, intensities = lidar_to_pano_with_intensities(
@@ -268,6 +268,7 @@ def LiDAR_2_Pano_eth(
         lidar_K=intrinsics,
         max_depth=max_depth,
     )
+    print(f"pano, intensities shape: {pano.shape} - {intensities.shape}")
     range_view = np.zeros((lidar_H, lidar_W, 3))
     range_view[:, :, 1] = intensities
     range_view[:, :, 2] = pano
@@ -295,21 +296,21 @@ def generate_eth_train_data(
     for lidar_path in tqdm(lidar_paths):
         point_cloud = np.fromfile(lidar_path, dtype=np.float32)
         point_cloud = point_cloud.reshape((-1, points_dim))
+        print(f"pc shape: {point_cloud.shape}")
         pano = LiDAR_2_Pano_eth(point_cloud, H, W, intrinsics)
         frame_name = lidar_path.split("/")[-1]
         suffix = frame_name.split(".")[-1]
         frame_name = frame_name.replace(suffix, "npy")
+        print(f"saving range image to: {out_dir / frame_name}")
+        quit()
         np.save(out_dir / frame_name, pano)
 
 def create_eth_rangeview(args):
     project_root = Path(__file__).parent.parent
     eth_root = project_root / "data" / "eth"
-    print(f"project root: {project_root}")
-    print(f"eth dataset root: {eth_root}")
     
     sequence_name = args.seq_id
     out_dir = eth_root / sequence_name / "train"
-    print(f"sequence name: {sequence_name}")
     print(f"writing range view images to: {out_dir}")
 
     H = 125
@@ -319,25 +320,18 @@ def create_eth_rangeview(args):
     s_frame_id = args.start_frame
     e_frame_id = args.end_frame  # Inclusive TODO: set these correctly
     frame_ids = list(range(s_frame_id, e_frame_id + 1))
-    print(f"start frame #: {s_frame_id}, end frame #: {e_frame_id}")
-    print(f"selected frame #s: {frame_ids}")
 
     lidar_dir = eth_root / sequence_name / "lidar"
     lidar_frames = os.listdir(lidar_dir)
     lidar_frames = sorted([f for f in lidar_frames if f.endswith('.bin')])
-    print(f"reading LiDAR data from: {lidar_dir}")
-    print(f"sorted lidar frames found: {lidar_frames}")
 
     # convert ids to lidar timestamps
     # NOTE: frame idx are 1-indexed
     lidar_paths = [lidar_frames[frame_id-1] for frame_id in frame_ids]
-    print(f"frame #s converted to corresponding LiDAR filenames: {lidar_paths}")
 
     lidar_paths = [
         os.path.join(lidar_dir, lidar_filename) for lidar_filename in lidar_paths
     ]
-    print(lidar_paths)
-    quit()
 
     generate_eth_train_data(
         H=H,
