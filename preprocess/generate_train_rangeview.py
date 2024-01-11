@@ -314,7 +314,7 @@ def vis_pc_range_img(pano, point_cloud, render_path):
 
     #view_pc(point_cloud, render_path=render_path + ".png")
 
-    plt.imsave(render_path + "_rangeview.png", pano)
+    plt.imsave(render_path + "_rangeview.png", pano.astype(np.uint8))
 
 def LiDAR_2_Pano_eth(
     local_points_with_intensities, lidar_H, lidar_W, intrinsics, max_depth=180.0
