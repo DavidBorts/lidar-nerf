@@ -97,6 +97,7 @@ class ETHDataset(BaseDataset):
                 self.images_lidar = self.images_lidar.to(dtype).to(self.device)
 
         self.intrinsics_lidar = (12.5, 120.0)  # fov_up, fov
+        self.intrinsics_lidar_hor = (-60, 60)
 
     def collate(self, index):
         B = len(index)  # a list of length 1
@@ -112,6 +113,7 @@ class ETHDataset(BaseDataset):
                 self.W_lidar,
                 self.num_rays_lidar,
                 self.patch_size_lidar,
+                intrinsics_hor=self.intrinsics_lidar_hor
             )
 
             results.update(

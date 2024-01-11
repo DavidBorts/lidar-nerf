@@ -13,7 +13,7 @@ def custom_meshgrid(*args):
 
 
 @torch.cuda.amp.autocast(enabled=False)
-def get_lidar_rays(poses, intrinsics, H, W, N=-1, patch_size=1):
+def get_lidar_rays(poses, intrinsics, H, W, N=-1, patch_size=1, intrinsics_hor=None):
     """
     Get lidar rays.
 
@@ -83,7 +83,11 @@ def get_lidar_rays(poses, intrinsics, H, W, N=-1, patch_size=1):
         results["inds"] = inds
 
     fov_up, fov = intrinsics
-    beta = -(i - W / 2) / W * 2 * np.pi
+    if intrinsics_hor is not None:
+        fov_left, fov_right = intrinsics_hor
+        beta = -(i/(fov_right-fov_left)-fov_left/360) * 2 * np.pi
+    else:
+        beta = -(i - W / 2) / W * 2 * np.pi
     alpha = (fov_up - j / H * fov) / 180 * np.pi
 
     directions = torch.stack(
