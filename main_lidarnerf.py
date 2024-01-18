@@ -22,6 +22,11 @@ def get_arg_parser():
         default="configs/eth.txt",
         help="config file path",
     )
+    parser.add_argument(
+        "--name",
+        type=str,
+        help="job name"
+    )
     parser.add_argument("--path", type=str, default="data/eth")
     parser.add_argument(
         "-L", action="store_true", help="equals --fp16 --tcnn --preload"
@@ -431,7 +436,7 @@ def main():
             depth_metrics = []
 
         trainer = Trainer(
-            "lidar_nerf",
+            opt.name,
             opt,
             model,
             device=device,
